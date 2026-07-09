@@ -1,24 +1,36 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Book shop</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
-<a href="/">Home</a>
-<a href="/books/">Books</a>
-<a href="/authors/">Authors</a>
-<a href="/orders/">Orders</a>
-<a href="/cart/">Cart</a>
-{% if user.is_authenticated %}
-    <a href="/logout/">Logout</a>
-{% else %}
-    <a href="/register/">Register</a>
-    <a href="/login/">Login</a>
-{% endif %}
+<header class="site-header">
+    <div class="nav-left">
+        <a href="/" class="brand">Book shop</a>
+        <a href="/books/" class="nav-link">Books</a>
+        <a href="/authors/" class="nav-link">Authors</a>
+        <a href="/orders/" class="nav-link">Orders</a>
+        <a href="/cart/" class="nav-link">Cart</a>
+    </div>
+    <div class="nav-right">
+        {% if user.is_authenticated %}
+            <span class="nav-greeting">Привіт, <strong>{{ user.username }}</strong>!</span>
+            <a href="/logout/" class="btn-pill outline">Logout</a>
+        {% else %}
+            <a href="/register/" class="btn-pill outline">Register</a>
+            <a href="/login/" class="btn-pill solid">Login</a>
+        {% endif %}
+    </div>
+</header>
+
+<main>
 {% block content %}
 {% endblock %}
+</main>
 
 </body>
 </html>

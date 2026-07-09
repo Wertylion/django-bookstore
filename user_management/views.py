@@ -1,9 +1,12 @@
 # user_management/views.py
 
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
+from django.views.generic import CreateView
 
 from .forms import UserFeedbackForm
 
@@ -29,3 +32,9 @@ class UserFeedback(LoginRequiredMixin, View):
         if feedback_form.is_valid():
             return HttpResponse('Дякуємо за відгук!')
         return render(request, 'user_feedback.html', {'feedback_form': feedback_form})
+
+
+class RegisterView(CreateView):
+    form_class = UserCreationForm
+    template_name = 'register.html'
+    success_url = reverse_lazy('login')  # редірект на сторінку логіну після реєстрації

@@ -13,7 +13,7 @@ from .models import Book, Category, Rating
 
 
 def main_page(request):
-    return HttpResponse("Hello")
+    return render(request, "home.html")
 
 
 class EditByOwnerMixin:
