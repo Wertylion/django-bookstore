@@ -1,31 +1,23 @@
-"""
-URL configuration for config project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+
+from shop import views
 from shop.views import main_page
-# from order.views import new_order
-# from user_manegment.views import user_feedback, user_register
+from config.views import error_401_403, error_404, error_500
+
+handler404 = error_404
+handler500 = error_500
+handler403 = error_401_403
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_page),
     path('book/', main_page),
-#     path('book/<int:book_id>', specidic_book),
-#     path('user_feedback/', user_feedback),
-#     path('nwe_order/', new_order),
-#     path('register/', user_register),
+    path('books/', views.book_list, name='book_list'),
+    path('category/<slug:slug>/', views.category_detail, name='category_detail'),
+    path('book/<int:pk>/feedback/', views.CreateFeedbackView.as_view(), name='new_feedback'),
+    path('book/<int:pk>/feedback/edit/', views.FeedbackUpdateView.as_view(), name='edit_feedback'),
+    path('order/', include('order.urls')),               # /order/new/
+    path('user/', include('user_management.urls')),      # /user/feedback/
 ]

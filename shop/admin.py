@@ -97,7 +97,7 @@ class RatingAdmin(admin.ModelAdmin):
 
     search_fields = (
         'book__title',
-        'user__name',
+        'user__username',
         'feedback',
     )
 

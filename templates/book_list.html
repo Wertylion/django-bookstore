@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Books</title>
+</head>
+<body>
+    <h1>Books</h1>
+
+    {% for book in books %}
+        <div>
+            <h2>{{ book.title }}</h2>
+            <p>Author:
+                {% for author in book.author.all %}
+                    {{ author.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p>Price: {{ book.price }}</p>
+        </div>
+    {% empty %}
+        <p>No books found.</p>
+    {% endfor %}
+</body>
+</html>

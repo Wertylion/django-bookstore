@@ -1,12 +1,53 @@
+# shop/views.py
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Count, Avg, Case, When, Value, IntegerField
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView
 
-from .models import Book, Category
+from .forms import RatingForm
+from .models import Book, Category, Rating
 
 
 def main_page(request):
     return HttpResponse("Hello")
+
+
+class EditByOwnerMixin:
+
+    def dispatch(self, request, *args, **kwargs):
+        rating = Rating.objects.filter(user=request.user, id=kwargs['pk']).first()
+        if rating:
+            return super().dispatch(request, *args, **kwargs)
+        raise PermissionDenied
+
+
+class CreateFeedbackView(LoginRequiredMixin, CreateView):
+    model = Rating
+    form_class = RatingForm
+    template_name = 'feedback.html'
+    success_url = reverse_lazy('book_list')
+
+    def form_valid(self, form):
+        form.instance.book = get_object_or_404(Book, pk=self.kwargs['pk'])
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class FeedbackUpdateView(EditByOwnerMixin, UpdateView):
+    model = Rating
+    form_class = RatingForm
+    template_name = 'feedback_update.html'
+    success_url = reverse_lazy('book_list')
+
+    def form_valid(self, form):
+        form.instance.book = get_object_or_404(Book, pk=self.kwargs['pk'])
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 def book_list(request):
     books = Book.objects.all()
@@ -18,13 +59,10 @@ def book_list(request):
 
     if category_slug:
         books = books.filter(category__slug=category_slug)
-
     if min_price:
         books = books.filter(price__gte=min_price)
-
     if max_price:
         books = books.filter(price__lte=max_price)
-
     if in_stock == '1':
         books = books.filter(amount__gt=0, available=True)
 
@@ -34,8 +72,7 @@ def book_list(request):
         'books': books,
         'categories': Category.objects.all(),
     }
-
-    return render(request, 'shop/book_list.html', context)
+    return render(request, 'book_list.html', context)
 
 
 def book_search(request):
@@ -49,12 +86,7 @@ def book_search(request):
             Q(publisher__name__icontains=query)
         ).distinct()
 
-    context = {
-        'query': query,
-        'books': books,
-    }
-
-    return render(request, 'shop/book_search.html', context)
+    return render(request, 'book_search.html', {'query': query, 'books': books})
 
 
 def category_detail(request, slug):
@@ -79,8 +111,7 @@ def category_detail(request, slug):
         'books': books,
         'stats': stats,
     }
-
-    return render(request, 'shop/category_detail.html', context)
+    return render(request, 'category_detail.html', context)
 
 
 def category_stats(request):
@@ -89,11 +120,7 @@ def category_stats(request):
         avg_price=Avg('book__price'),
     ).order_by('-book_count')
 
-    context = {
-        'categories': categories,
-    }
-
-    return render(request, 'shop/category_stats.html', context)
+    return render(request, 'category_stats.html', {'categories': categories})
 
 
 def low_stock_books(request):
@@ -109,8 +136,7 @@ def low_stock_books(request):
         'low_stock': low_stock,
         'out_of_stock': out_of_stock,
     }
-
-    return render(request, 'shop/low_stock.html', context)
+    return render(request, 'low_stock.html', context)
 
 
 def author_or_title_books(request):
@@ -123,13 +149,6 @@ def author_or_title_books(request):
     ).distinct()
 
     if exclude_category:
-        books = books.filter(
-            ~Q(category__slug=exclude_category)
-        ).distinct()
+        books = books.filter(~Q(category__slug=exclude_category)).distinct()
 
-    context = {
-        'books': books,
-        'search': search,
-    }
-
-    return render(request, 'shop/author_books.html', context)
+    return render(request, 'author_books.html', {'books': books, 'search': search})
