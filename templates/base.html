@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book shop</title>
+</head>
+
+<body>
+<a href="/">Home</a>
+<a href="/books/">Books</a>
+<a href="/authors/">Authors</a>
+<a href="/orders/">Orders</a>
+<a href="/cart/">Cart</a>
+{% if user.is_authenticated %}
+    <a href="/logout/">Logout</a>
+{% else %}
+    <a href="/register/">Register</a>
+    <a href="/login/">Login</a>
+{% endif %}
+{% block content %}
+{% endblock %}
+
+</body>
+</html>
