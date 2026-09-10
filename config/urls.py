@@ -1,10 +1,10 @@
 
 from django.contrib import admin
+from django.conf import settings
 from django.urls import path, include
 
-from shop import views
-from shop.views import main_page
 from config.views import error_401_403, error_404, error_500
+from user_management.views import RegisterView
 
 handler404 = error_404
 handler500 = error_500
@@ -12,12 +12,13 @@ handler403 = error_401_403
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', main_page),
-    path('book/', main_page),
-    path('books/', views.book_list, name='book_list'),
-    path('category/<slug:slug>/', views.category_detail, name='category_detail'),
-    path('book/<int:pk>/feedback/', views.CreateFeedbackView.as_view(), name='new_feedback'),
-    path('book/<int:pk>/feedback/edit/', views.FeedbackUpdateView.as_view(), name='edit_feedback'),
-    path('order/', include('order.urls')),               # /order/new/
-    path('user/', include('user_management.urls')),      # /user/feedback/
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('', include(('shop.urls', 'shop'), namespace='shop')),
+    path('', include('django.contrib.auth.urls')),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('order/', include(('order.urls', 'order'), namespace='order')),
+    path('user/', include(('user_management.urls', 'user_management'), namespace='user_management')),
 ]
+
+if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+    urlpatterns.append(path('__debug__/', include('debug_toolbar.urls')))

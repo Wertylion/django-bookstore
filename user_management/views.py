@@ -1,40 +1,27 @@
 # user_management/views.py
 
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, FormView
 
-from .forms import UserFeedbackForm
-
-
-def user_feedback(request):
-    if request.method == 'POST':
-        feedback_form = UserFeedbackForm(request.POST)
-        if feedback_form.is_valid():
-            return redirect('book_list')  # після успіху — редирект
-    else:
-        feedback_form = UserFeedbackForm()
-
-    return render(request, 'user_feedback.html', {'feedback_form': feedback_form})
+from .forms import CustomUserCreationForm, UserFeedbackForm
 
 
-class UserFeedback(LoginRequiredMixin, View):
-    def get(self, request):
-        feedback_form = UserFeedbackForm()
-        return render(request, 'user_feedback.html', {'feedback_form': feedback_form})
+class UserFeedback(LoginRequiredMixin, FormView):
+    form_class = UserFeedbackForm
+    template_name = 'user_feedback.html'
 
-    def post(self, request):
-        feedback_form = UserFeedbackForm(request.POST)
-        if feedback_form.is_valid():
-            return HttpResponse('Дякуємо за відгук!')
-        return render(request, 'user_feedback.html', {'feedback_form': feedback_form})
+    def form_valid(self, form):
+        return HttpResponse('Дякуємо за відгук!')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['feedback_form'] = context['form']
+        return context
 
 
 class RegisterView(CreateView):
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     template_name = 'register.html'
     success_url = reverse_lazy('login')  # редірект на сторінку логіну після реєстрації

@@ -1,7 +1,28 @@
 # shop/forms.py
 
 from django import forms
-from .models import Rating
+from django.utils.translation import gettext_lazy as _
+from .models import Book, Rating
+
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = [
+            'title',
+            'author',
+            'category',
+            'price',
+            'published_year',
+            'amount',
+            'available',
+            'publisher',
+            'calculated_average',
+        ]
+        widgets = {
+            'author': forms.CheckboxSelectMultiple,
+            'category': forms.CheckboxSelectMultiple,
+        }
 
 
 class RatingForm(forms.ModelForm):
@@ -13,6 +34,6 @@ class RatingForm(forms.ModelForm):
             'feedback': forms.Textarea(attrs={'rows': 4}),
         }
         labels = {
-            'rating': 'Оцінка (1-5)',
-            'feedback': 'Відгук',
+            'rating': _('Rating (1-5)'),
+            'feedback': _('Feedback'),
         }

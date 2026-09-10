@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('shop', '0001_initial'),
-        ('user_management', '0001_initial'),
+        ('user_management', '0002_delivery_address_last_view'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -21,11 +21,11 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('total_price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('status', models.CharField(max_length=20)),
+                ('status', models.CharField(choices=[('PENDING', 'Очікує'), ('PROCESSING', 'В обробці'), ('SHIPPED', 'Відправлено'), ('DELIVERED', 'Доставлено'), ('CANCELED', 'Скасовано')], default='PENDING', max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('payment_status', models.CharField(max_length=20)),
-                ('payment_method', models.CharField(max_length=20)),
-                ('ttn', models.CharField(max_length=20)),
+                ('payment_status', models.CharField(choices=[('PENDING', 'Очікує'), ('PROCESSING', 'В обробці'), ('COMPLETED', 'Завершено'), ('FAILED', 'Помилка')], default='PENDING', max_length=20)),
+                ('payment_method', models.CharField(choices=[('CASH', 'Готівка'), ('CARD', 'Картка'), ('ONLINE', 'Онлайн')], default='CARD', max_length=20)),
+                ('ttn', models.CharField(blank=True, max_length=20)),
                 ('delivery_address', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user_management.deliveryaddress')),
                 ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

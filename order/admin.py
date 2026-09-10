@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Sum, F
 
-from .models import Order, OrderDetails
+from .models import Order, OrderDetails, OrderItem
 
 
 class OrderDetailsInline(admin.TabularInline):
@@ -13,6 +13,20 @@ class OrderDetailsInline(admin.TabularInline):
     def subtotal(self, obj):
         if obj.pk:
             return obj.amount * obj.price
+        return '—'
+
+    subtotal.short_description = 'Сума'
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    fields = ('book', 'quantity', 'price', 'subtotal')
+    readonly_fields = ('subtotal',)
+
+    def subtotal(self, obj):
+        if obj.pk:
+            return obj.subtotal
         return '—'
 
     subtotal.short_description = 'Сума'
@@ -47,11 +61,11 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
     date_hierarchy = 'created_at'
-    inlines = [OrderDetailsInline]
+    inlines = [OrderItemInline]
 
     def total_sum(self, obj):
-        total = obj.orderdetails_set.aggregate(
-            total=Sum(F('amount') * F('price'))
+        total = obj.items.aggregate(
+            total=Sum(F('quantity') * F('price'))
         )['total']
 
         if total:
@@ -85,5 +99,23 @@ class OrderDetailsAdmin(admin.ModelAdmin):
     subtotal.short_description = 'Сума'
 
 
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = (
+        'order',
+        'book',
+        'quantity',
+        'price',
+        'subtotal',
+    )
+    list_filter = (
+        'order__status',
+    )
+    search_fields = (
+        'order__id',
+        'book__title',
+    )
+
+
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderDetails, OrderDetailsAdmin)
+admin.site.register(OrderItem, OrderItemAdmin)

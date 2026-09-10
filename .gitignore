@@ -2,5 +2,11 @@
 __pycache__/
 *.pyc
 db.sqlite3
+db.sqlite3.*
+logs/
+staticfiles/
+media/
+.env
+.coverage
 .idea/
 .DS_Store

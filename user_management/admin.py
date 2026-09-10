@@ -1,6 +1,25 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
-from .models import DeliveryAddress, LastView
+from .models import CustomUser, DeliveryAddress, LastView
+
+
+class CustomUserAdmin(UserAdmin):
+    fieldsets = UserAdmin.fieldsets + (
+        ('Додаткова інформація', {'fields': ('phone', 'address')}),
+    )
+
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Додаткова інформація', {'fields': ('email', 'phone', 'address')}),
+    )
+
+    list_display = (
+        'username',
+        'email',
+        'phone',
+        'is_staff',
+        'is_active',
+    )
 
 
 class DeliveryAddressAdmin(admin.ModelAdmin):
@@ -42,5 +61,6 @@ class LastViewAdmin(admin.ModelAdmin):
     book_price.short_description = 'Ціна'
 
 
+admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(DeliveryAddress, DeliveryAddressAdmin)
 admin.site.register(LastView, LastViewAdmin)
