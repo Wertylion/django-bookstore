@@ -1,0 +1,13 @@
+[run]
+source =
+    shop
+    order
+    user_management
+omit =
+    */migrations/*
+    */tests/*
+    manage.py
+
+[report]
+skip_empty = True
+show_missing = True

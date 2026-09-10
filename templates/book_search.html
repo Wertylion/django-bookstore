@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Search" %}</h1>
+
+<form method="get" class="d-flex gap-2 mb-4">
+    <input type="search" name="q" value="{{ query }}" class="form-control" placeholder="{% trans 'Search books' %}">
+    <button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
+</form>
+
+<div class="list-group">
+    {% for book in books %}
+        <a class="list-group-item list-group-item-action" href="{% url 'shop:book_detail' book.pk %}">
+            {{ book.title }}
+        </a>
+    {% empty %}
+        <p class="list-group-item">{% trans "No books found." %}</p>
+    {% endfor %}
+</div>
+{% endblock %}

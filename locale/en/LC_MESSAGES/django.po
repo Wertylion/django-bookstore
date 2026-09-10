@@ -1,0 +1,435 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-10 15:31+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: order/forms.py:14
+msgid "Delivery address"
+msgstr ""
+
+#: order/forms.py:15
+msgid "Payment method"
+msgstr ""
+
+#: order/models.py:8 order/models.py:16
+msgid "Pending"
+msgstr ""
+
+#: order/models.py:9 order/models.py:17
+msgid "Processing"
+msgstr ""
+
+#: order/models.py:10
+msgid "Shipped"
+msgstr ""
+
+#: order/models.py:11
+msgid "Delivered"
+msgstr ""
+
+#: order/models.py:12
+msgid "Canceled"
+msgstr ""
+
+#: order/models.py:18
+msgid "Completed"
+msgstr ""
+
+#: order/models.py:19
+msgid "Failed"
+msgstr ""
+
+#: order/models.py:23
+msgid "Cash"
+msgstr ""
+
+#: order/models.py:24
+msgid "Card"
+msgstr ""
+
+#: order/models.py:25
+msgid "Online"
+msgstr ""
+
+#: order/models.py:29 order/models.py:76 shop/models.py:62 shop/models.py:70
+#: user_management/models.py:32
+msgid "book"
+msgstr ""
+
+#: order/models.py:30 order/models.py:77 shop/models.py:51
+msgid "price"
+msgstr ""
+
+#: order/models.py:31 shop/models.py:54
+msgid "amount"
+msgstr ""
+
+#: order/models.py:32 order/models.py:67 order/models.py:75
+msgid "order"
+msgstr ""
+
+#: order/models.py:39 user_management/models.py:24 user_management/models.py:33
+msgid "owner"
+msgstr ""
+
+#: order/models.py:41 user_management/models.py:27
+msgid "delivery address"
+msgstr ""
+
+#: order/models.py:43
+msgid "total price"
+msgstr ""
+
+#: order/models.py:49
+msgid "status"
+msgstr ""
+
+#: order/models.py:51
+msgid "created at"
+msgstr ""
+
+#: order/models.py:56
+msgid "payment status"
+msgstr ""
+
+#: order/models.py:62
+msgid "payment method"
+msgstr ""
+
+#: order/models.py:64
+msgid "tracking number"
+msgstr ""
+
+#: order/models.py:68
+msgid "orders"
+msgstr ""
+
+#: order/models.py:78
+msgid "quantity"
+msgstr ""
+
+#: order/models.py:81
+msgid "order item"
+msgstr ""
+
+#: order/models.py:82
+msgid "order items"
+msgstr ""
+
+#: shop/forms.py:37
+msgid "Rating (1-5)"
+msgstr ""
+
+#: shop/forms.py:38
+msgid "Feedback"
+msgstr ""
+
+#: shop/models.py:7 shop/models.py:23 shop/models.py:36
+msgid "name"
+msgstr ""
+
+#: shop/models.py:8 user_management/models.py:9
+msgid "address"
+msgstr ""
+
+#: shop/models.py:9 user_management/models.py:21
+msgid "city"
+msgstr ""
+
+#: shop/models.py:10
+msgid "state/province"
+msgstr ""
+
+#: shop/models.py:11
+msgid "country"
+msgstr ""
+
+#: shop/models.py:12
+msgid "website"
+msgstr ""
+
+#: shop/models.py:15 shop/models.py:56
+msgid "publisher"
+msgstr ""
+
+#: shop/models.py:16
+msgid "publishers"
+msgstr ""
+
+#: shop/models.py:24
+msgid "email"
+msgstr ""
+
+#: shop/models.py:25
+msgid "bio"
+msgstr ""
+
+#: shop/models.py:28
+msgid "author"
+msgstr ""
+
+#: shop/models.py:29 shop/models.py:49
+msgid "authors"
+msgstr ""
+
+#: shop/models.py:37
+msgid "slug"
+msgstr ""
+
+#: shop/models.py:40
+msgid "category"
+msgstr ""
+
+#: shop/models.py:41 shop/models.py:50
+msgid "categories"
+msgstr ""
+
+#: shop/models.py:48
+msgid "title"
+msgstr ""
+
+#: shop/models.py:52
+msgid "added at"
+msgstr ""
+
+#: shop/models.py:53
+msgid "published year"
+msgstr ""
+
+#: shop/models.py:55
+msgid "available"
+msgstr ""
+
+#: shop/models.py:59
+msgid "average rating"
+msgstr ""
+
+#: shop/models.py:63
+msgid "books"
+msgstr ""
+
+#: shop/models.py:71 user_management/models.py:12
+msgid "user"
+msgstr ""
+
+#: shop/models.py:72 shop/models.py:76
+msgid "rating"
+msgstr ""
+
+#: shop/models.py:73
+msgid "feedback"
+msgstr ""
+
+#: shop/models.py:77
+msgid "ratings"
+msgstr ""
+
+#: templates/base.html:7 templates/base.html:15
+msgid "Book shop"
+msgstr ""
+
+#: templates/base.html:22 templates/book_list.html:6
+msgid "Books"
+msgstr ""
+
+#: templates/base.html:23 templates/book_search.html:5
+#: templates/book_search.html:9
+msgid "Search"
+msgstr ""
+
+#: templates/base.html:24
+msgid "Categories"
+msgstr ""
+
+#: templates/base.html:25 templates/cart/detail.html:6
+#: templates/new_order.html:7
+msgid "Cart"
+msgstr ""
+
+#: templates/base.html:26 templates/cart/detail.html:44
+msgid "Checkout"
+msgstr ""
+
+#: templates/base.html:30
+msgid "Hello"
+msgstr ""
+
+#: templates/base.html:33
+msgid "Logout"
+msgstr ""
+
+#: templates/base.html:36 templates/register.html:6 templates/register.html:10
+msgid "Register"
+msgstr ""
+
+#: templates/base.html:37 templates/registration/login.html:6
+#: templates/registration/login.html:10
+msgid "Login"
+msgstr ""
+
+#: templates/book_list.html:7
+msgid "Add book"
+msgstr ""
+
+#: templates/book_list.html:12
+msgid "Category"
+msgstr ""
+
+#: templates/book_list.html:14
+msgid "All categories"
+msgstr ""
+
+#: templates/book_list.html:23
+msgid "Min price"
+msgstr ""
+
+#: templates/book_list.html:27
+msgid "Max price"
+msgstr ""
+
+#: templates/book_list.html:33
+msgid "In stock"
+msgstr ""
+
+#: templates/book_list.html:37
+msgid "Apply"
+msgstr ""
+
+#: templates/book_list.html:38
+msgid "Reset"
+msgstr ""
+
+#: templates/book_list.html:51
+msgid "Author"
+msgstr ""
+
+#: templates/book_list.html:57
+msgid "Price"
+msgstr ""
+
+#: templates/book_list.html:60
+msgid "Edit"
+msgstr ""
+
+#: templates/book_list.html:61
+msgid "Delete"
+msgstr ""
+
+#: templates/book_list.html:67
+msgid "Add to cart"
+msgstr ""
+
+#: templates/book_list.html:71 templates/book_search.html:18
+msgid "No books found."
+msgstr ""
+
+#: templates/book_list.html:80
+msgid "Previous"
+msgstr ""
+
+#: templates/book_list.html:92
+msgid "Next"
+msgstr ""
+
+#: templates/book_search.html:8
+msgid "Search books"
+msgstr ""
+
+#: templates/cart/detail.html:7
+msgid "Continue shopping"
+msgstr ""
+
+#: templates/cart/detail.html:23
+msgid "Update"
+msgstr ""
+
+#: templates/cart/detail.html:27
+msgid "Remove"
+msgstr ""
+
+#: templates/cart/detail.html:33 templates/new_order.html:15
+msgid "Cart is empty."
+msgstr ""
+
+#: templates/cart/detail.html:38 templates/new_order.html:19
+msgid "Total"
+msgstr ""
+
+#: templates/cart/detail.html:42
+msgid "Clear"
+msgstr ""
+
+#: templates/new_order.html:5
+msgid "New order"
+msgstr ""
+
+#: templates/new_order.html:24
+msgid "Create order"
+msgstr ""
+
+#: templates/register.html:12
+msgid "Already have an account? Login"
+msgstr ""
+
+#: templates/registration/login.html:12
+msgid "No account? Register"
+msgstr ""
+
+#: user_management/forms.py:19
+msgid "Your name"
+msgstr ""
+
+#: user_management/forms.py:22
+msgid "Email"
+msgstr ""
+
+#: user_management/forms.py:26
+msgid "Message"
+msgstr ""
+
+#: user_management/models.py:8
+msgid "phone"
+msgstr ""
+
+#: user_management/models.py:13
+msgid "users"
+msgstr ""
+
+#: user_management/models.py:20
+msgid "post code"
+msgstr ""
+
+#: user_management/models.py:22
+msgid "state"
+msgstr ""
+
+#: user_management/models.py:23
+msgid "branch"
+msgstr ""
+
+#: user_management/models.py:28
+msgid "delivery addresses"
+msgstr ""
+
+#: user_management/models.py:36
+msgid "last view"
+msgstr ""
+
+#: user_management/models.py:37
+msgid "last views"
+msgstr ""

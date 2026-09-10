@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">{% trans "Cart" %}</h1>
+    <a href="{% url 'shop:book_list' %}" class="btn btn-outline-primary">{% trans "Continue shopping" %}</a>
+</div>
+
+<div class="list-group mb-4">
+    {% for item in cart %}
+        <article class="list-group-item">
+            <div class="d-flex justify-content-between gap-3">
+                <div>
+                    <h2 class="h5 mb-1">{{ item.book.title }}</h2>
+                    <p class="mb-0">{{ item.quantity }} x {{ item.price }} = <strong>{{ item.total_price }}</strong></p>
+                </div>
+                <div class="d-flex gap-2 align-items-start">
+                    <form method="post" action="{% url 'order:cart_add' item.book.pk %}" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="override" value="1">
+                        <input type="number" name="quantity" min="1" value="{{ item.quantity }}" class="form-control form-control-sm" style="max-width: 90px;">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Update" %}</button>
+                    </form>
+                    <form method="post" action="{% url 'order:cart_remove' item.book.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">{% trans "Remove" %}</button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <p class="list-group-item">{% trans "Cart is empty." %}</p>
+    {% endfor %}
+</div>
+
+<div class="d-flex justify-content-between align-items-center">
+    <p class="h4 mb-0">{% trans "Total" %}: {{ cart.get_total_price }}</p>
+    <div class="d-flex gap-2">
+        <form method="post" action="{% url 'order:cart_clear' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger">{% trans "Clear" %}</button>
+        </form>
+        <a href="{% url 'order:new_order' %}" class="btn btn-success">{% trans "Checkout" %}</a>
+    </div>
+</div>
+{% endblock %}

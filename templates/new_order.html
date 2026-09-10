@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "New order" %}</h1>
+
+<h2 class="h4 mt-4">{% trans "Cart" %}</h2>
+<ul class="list-group mb-4">
+    {% for item in cart %}
+        <li class="list-group-item d-flex justify-content-between">
+            <span>{{ item.book.title }} x {{ item.quantity }}</span>
+            <strong>{{ item.total_price }}</strong>
+        </li>
+    {% empty %}
+        <li class="list-group-item">{% trans "Cart is empty." %}</li>
+    {% endfor %}
+</ul>
+
+<p class="fw-bold">{% trans "Total" %}: {{ cart.get_total_price }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ order_form.as_p }}
+    <button type="submit">{% trans "Create order" %}</button>
+</form>
+{% endblock %}

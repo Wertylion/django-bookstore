@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ book.title }}</h1>
+
+<p>Author:
+    {% for author in book.author.all %}
+        {{ author.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+<p>Category:
+    {% for category in book.category.all %}
+        {{ category.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+<p>Publisher: {{ book.publisher.name }}</p>
+<p>Price: {{ book.price }}</p>
+<p>Published year: {{ book.published_year }}</p>
+<p>Amount: {{ book.amount }}</p>
+<p>Available: {{ book.available|yesno:"Yes,No" }}</p>
+
+<p>
+    <a href="{% url 'shop:book_update' book.pk %}">Edit</a>
+    <a href="{% url 'shop:book_delete' book.pk %}">Delete</a>
+</p>
+
+<form method="post" action="{% url 'order:cart_add' book.pk %}" class="d-flex align-items-center gap-2 mt-3">
+    {% csrf_token %}
+    <input type="number" name="quantity" min="1" value="1" class="form-control" style="max-width: 100px;">
+    <button type="submit" class="btn btn-success">Add to cart</button>
+</form>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Order #{{ order.pk }} created</h1>
+<p>Total: {{ order.total_price }}</p>
+<p>Payment status: {{ order.get_payment_status_display }}</p>
+
+<ul class="list-group my-4">
+    {% for item in order.items.all %}
+        <li class="list-group-item d-flex justify-content-between">
+            <span>{{ item.book.title }} x {{ item.quantity }}</span>
+            <strong>{{ item.subtotal }}</strong>
+        </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'shop:book_list' %}" class="btn btn-primary">Back to books</a>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "order_success.html" %}
+
+{% block content %}
+<h1>Payment successful</h1>
+<p>Order #{{ order.pk }} is paid through Stripe Checkout.</p>
+{{ block.super }}
+{% endblock %}
