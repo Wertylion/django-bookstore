@@ -1,11 +1,15 @@
 # shop/views.py
 
+from decimal import Decimal, InvalidOperation
+
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Count, Avg, Case, When, Value, IntegerField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -16,14 +20,18 @@ from django.views.generic import (
 )
 
 from .forms import BookForm, RatingForm
+from .cache import aget_cached_book_detail, get_cached_book_detail
 from .models import Book, Category, Rating
 
 
 class MainPageView(TemplateView):
+    """Render the public home page for the bookstore."""
+
     template_name = 'home.html'
 
 
 class EditByOwnerMixin:
+    """Allow editing a rating only when it belongs to the current user."""
 
     def dispatch(self, request, *args, **kwargs):
         rating = Rating.objects.filter(user=request.user, id=kwargs['pk']).first()
@@ -33,6 +41,8 @@ class EditByOwnerMixin:
 
 
 class CreateFeedbackView(LoginRequiredMixin, CreateView):
+    """Create a rating for a selected book and attach it to the logged-in user."""
+
     model = Rating
     form_class = RatingForm
     template_name = 'feedback.html'
@@ -45,6 +55,8 @@ class CreateFeedbackView(LoginRequiredMixin, CreateView):
 
 
 class FeedbackUpdateView(LoginRequiredMixin, EditByOwnerMixin, UpdateView):
+    """Update the logged-in user's existing rating."""
+
     model = Rating
     form_class = RatingForm
     template_name = 'feedback_update.html'
@@ -52,17 +64,33 @@ class FeedbackUpdateView(LoginRequiredMixin, EditByOwnerMixin, UpdateView):
 
 
 class BookListView(ListView):
+    """List books with category, price, stock filters and pagination."""
+
     model = Book
     template_name = 'book_list.html'
     context_object_name = 'books'
     paginate_by = 10
 
+    @method_decorator(cache_page(60 * 5, key_prefix='book_list'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    @staticmethod
+    def parse_price(value):
+        """Convert a query string price to Decimal or ignore invalid input."""
+        if not value:
+            return None
+        try:
+            return Decimal(value)
+        except (InvalidOperation, TypeError):
+            return None
+
     def get_queryset(self):
         books = Book.objects.prefetch_related('author', 'category').select_related('publisher')
 
         category_slug = self.request.GET.get('category')
-        min_price = self.request.GET.get('min_price')
-        max_price = self.request.GET.get('max_price')
+        min_price = self.parse_price(self.request.GET.get('min_price'))
+        max_price = self.parse_price(self.request.GET.get('max_price'))
         in_stock = self.request.GET.get('in_stock')
 
         if category_slug:
@@ -83,13 +111,22 @@ class BookListView(ListView):
 
 
 class BookDetailView(PermissionRequiredMixin, DetailView):
+    """Show details for one book to users with view permission."""
+
     model = Book
     template_name = 'book_detail.html'
     context_object_name = 'book'
     permission_required = 'shop.view_book'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cached_book'] = get_cached_book_detail(self.object.pk)
+        return context
+
 
 class BookCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    """Create a book record for users with add permission."""
+
     model = Book
     form_class = BookForm
     template_name = 'book_form.html'
@@ -98,6 +135,8 @@ class BookCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
 
 class BookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """Update a book record for users with change permission."""
+
     model = Book
     form_class = BookForm
     template_name = 'book_form.html'
@@ -106,6 +145,8 @@ class BookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
 
 class BookDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """Delete a book record for users with delete permission."""
+
     model = Book
     template_name = 'book_confirm_delete.html'
     success_url = reverse_lazy('shop:book_list')
@@ -113,6 +154,8 @@ class BookDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 
 class BookSearchView(ListView):
+    """Search books by title, author or publisher."""
+
     model = Book
     template_name = 'book_search.html'
     context_object_name = 'books'
@@ -135,6 +178,8 @@ class BookSearchView(ListView):
 
 
 class CategoryDetailView(DetailView):
+    """Show category details, related books and aggregate category statistics."""
+
     model = Category
     template_name = 'category_detail.html'
     context_object_name = 'category'
@@ -160,9 +205,15 @@ class CategoryDetailView(DetailView):
 
 
 class CategoryStatsView(ListView):
+    """List categories with book count and average book price."""
+
     model = Category
     template_name = 'category_stats.html'
     context_object_name = 'categories'
+
+    @method_decorator(cache_page(60 * 10, key_prefix='category_stats'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Category.objects.annotate(
@@ -172,6 +223,8 @@ class CategoryStatsView(ListView):
 
 
 class LowStockBooksView(ListView):
+    """List low-stock books and expose out-of-stock books in context."""
+
     model = Book
     template_name = 'low_stock.html'
     context_object_name = 'low_stock'
@@ -190,6 +243,8 @@ class LowStockBooksView(ListView):
 
 
 class AuthorOrTitleBooksView(ListView):
+    """Search books by author or title with optional category exclusion."""
+
     model = Book
     template_name = 'author_books.html'
     context_object_name = 'books'
@@ -215,6 +270,8 @@ class AuthorOrTitleBooksView(ListView):
 
 
 async def async_catalog_summary(request):
+    """Return async JSON summary for catalog counters."""
+
     total_books = await Book.objects.acount()
     total_categories = await Category.objects.acount()
     available_books = await Book.objects.filter(available=True, amount__gt=0).acount()
@@ -227,6 +284,8 @@ async def async_catalog_summary(request):
 
 
 async def async_available_books(request):
+    """Return async JSON list of available books."""
+
     books = []
     queryset = Book.objects.filter(available=True).order_by('title').values(
         'id',
@@ -247,21 +306,10 @@ async def async_available_books(request):
 
 
 async def async_book_detail(request, pk):
-    book = await Book.objects.select_related('publisher').aget(pk=pk)
-    authors = []
-    categories = []
+    """Return async JSON details for one book."""
 
-    async for author in book.author.order_by('name').values_list('name', flat=True):
-        authors.append(author)
-
-    async for category in book.category.order_by('name').values_list('name', flat=True):
-        categories.append(category)
-
-    return JsonResponse({
-        'id': book.pk,
-        'title': book.title,
-        'publisher': book.publisher.name,
-        'authors': authors,
-        'categories': categories,
-        'price': str(book.price),
-    })
+    try:
+        data = await aget_cached_book_detail(pk)
+    except Book.DoesNotExist:
+        return JsonResponse({'detail': 'Book not found.'}, status=404)
+    return JsonResponse(data)

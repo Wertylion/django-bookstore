@@ -50,7 +50,10 @@ class Cart:
     def __iter__(self):
         book_ids = self.cart.keys()
         books = Book.objects.filter(id__in=book_ids)
-        cart = self.cart.copy()
+        cart = {
+            book_id: item.copy()
+            for book_id, item in self.cart.items()
+        }
 
         for book in books:
             item = cart[str(book.id)]

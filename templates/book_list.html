@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load cache i18n %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -41,6 +41,7 @@
 
 <div class="list-group mb-4">
 {% for book in page_obj %}
+    {% cache 300 book_list_item book.pk book.updated_at|default:book.added_at %}
     <article class="list-group-item">
         <div class="d-flex justify-content-between gap-3">
             <div>
@@ -67,6 +68,7 @@
             <button type="submit" class="btn btn-sm btn-success">{% trans "Add to cart" %}</button>
         </form>
     </article>
+    {% endcache %}
 {% empty %}
     <p class="list-group-item">{% trans "No books found." %}</p>
 {% endfor %}

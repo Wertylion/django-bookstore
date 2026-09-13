@@ -9,6 +9,8 @@ from .forms import CustomUserCreationForm, UserFeedbackForm
 
 
 class UserFeedback(LoginRequiredMixin, FormView):
+    """Render and process the authenticated user feedback form."""
+
     form_class = UserFeedbackForm
     template_name = 'user_feedback.html'
 
@@ -22,6 +24,8 @@ class UserFeedback(LoginRequiredMixin, FormView):
 
 
 class RegisterView(CreateView):
+    """Register a new custom user account."""
+
     form_class = CustomUserCreationForm
     template_name = 'register.html'
     success_url = reverse_lazy('login')  # редірект на сторінку логіну після реєстрації

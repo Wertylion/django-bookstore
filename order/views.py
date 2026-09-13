@@ -3,7 +3,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -16,9 +15,12 @@ from shop.models import Book
 from .cart import Cart
 from .forms import NewOrderForm
 from .models import Order, OrderItem, PaymentMethod, PaymentStatus
+from .tasks import send_order_created_email
 
 
 class CartDetailView(TemplateView):
+    """Display the current session-based shopping cart."""
+
     template_name = 'cart/detail.html'
 
     def get_context_data(self, **kwargs):
@@ -28,6 +30,8 @@ class CartDetailView(TemplateView):
 
 
 class CartAddView(View):
+    """Add a book to the session cart or update its quantity."""
+
     def post(self, request, pk):
         cart = Cart(request)
         book = get_object_or_404(Book, pk=pk)
@@ -38,6 +42,8 @@ class CartAddView(View):
 
 
 class CartRemoveView(View):
+    """Remove one book from the session cart."""
+
     def post(self, request, pk):
         cart = Cart(request)
         book = get_object_or_404(Book, pk=pk)
@@ -46,16 +52,26 @@ class CartRemoveView(View):
 
 
 class CartClearView(View):
+    """Clear all items from the session cart."""
+
     def post(self, request):
         Cart(request).clear()
         return redirect('order:cart_detail')
 
 
 class NewOrderView(LoginRequiredMixin, CreateView):
+    """Create an order and its items from the session cart inside one transaction."""
+
     model = Order
     form_class = NewOrderForm
     template_name = 'new_order.html'
     context_object_name = 'order'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'POST' and len(Cart(request)) == 0:
+            messages.error(request, 'Кошик порожній.')
+            return redirect('order:cart_detail')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -64,10 +80,6 @@ class NewOrderView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         cart = Cart(self.request)
-        if len(cart) == 0:
-            messages.error(self.request, 'Кошик порожній.')
-            return redirect('order:cart_detail')
-
         with transaction.atomic():
             form.instance.owner = self.request.user
             form.instance.total_price = cart.get_total_price()
@@ -98,20 +110,12 @@ class NewOrderView(LoginRequiredMixin, CreateView):
         return context
 
     def send_order_email(self):
-        recipient = self.request.user.email
-        if not recipient:
-            return
-
-        send_mail(
-            subject=f'Замовлення #{self.object.pk} створено',
-            message=f'Ваше замовлення на суму {self.object.total_price} створено.',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[recipient],
-            fail_silently=True,
-        )
+        send_order_created_email.delay(self.object.pk)
 
 
 class CreateCheckoutSessionView(LoginRequiredMixin, View):
+    """Create a Stripe Checkout Session for an order owned by the user."""
+
     def get(self, request, pk):
         order = get_object_or_404(Order, pk=pk, owner=request.user)
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -150,6 +154,8 @@ class CreateCheckoutSessionView(LoginRequiredMixin, View):
 
 
 class OrderSuccessView(LoginRequiredMixin, TemplateView):
+    """Display a successfully created order."""
+
     template_name = 'order_success.html'
 
     def get_context_data(self, **kwargs):
@@ -163,6 +169,8 @@ class OrderSuccessView(LoginRequiredMixin, TemplateView):
 
 
 class PaymentSuccessView(OrderSuccessView):
+    """Mark an order as paid after a successful Stripe redirect."""
+
     template_name = 'payment_success.html'
 
     def get_context_data(self, **kwargs):
@@ -175,6 +183,8 @@ class PaymentSuccessView(OrderSuccessView):
 
 
 class PaymentCancelView(OrderSuccessView):
+    """Mark pending online payment as failed after a canceled Stripe redirect."""
+
     template_name = 'payment_cancel.html'
 
     def get_context_data(self, **kwargs):

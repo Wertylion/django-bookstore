@@ -1,5 +1,6 @@
 [run]
 source =
+    api
     shop
     order
     user_management
